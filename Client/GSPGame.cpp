@@ -137,34 +137,46 @@ void GSPGame::DrawAll(float elapsedTime)
 	m_gameTime += elapsedTime;
 }
 
-void GSPGame::KeyInput(GSPUserInterface* ui, float elapsedTime)
+void GSPGame::KeyInput(GSPUserInterface* ui, float elapsedTime,SOCKET socket)
 {
 	//character movement(hero)
-	float x, y, z;
-	x = y = z = 0.f;
+	
+	unsigned char bit[] = { 0b00000000 };
+	//player1 0
 	if (m_ObjectMgr->IsMoveCoolTimeExpired(m_HeroID))
 	{
 		if (ui->Is_SP_Arrow_Up_Down())
 		{
-			y += BLOCK_MOVE;
+			bit[0] |= 0b100;
 		}
 		if (ui->Is_SP_Arrow_Down_Down())
 		{
-			y -= BLOCK_MOVE;
+			bit[0] |= 0b10;
 		}
 		if (ui->Is_SP_Arrow_Left_Down())
 		{
-			x -= BLOCK_MOVE;
+			bit[0] |= 0b1000;
 		}
 		if (ui->Is_SP_Arrow_Right_Down())
 		{
-			x += BLOCK_MOVE;
+			bit[0] |= 0b1;
 		}
 
 		m_ObjectMgr->ResetMoveCoolTime(m_HeroID);
 	}
+	WSABUF wsabuf[1];
+	wsabuf[0].buf = reinterpret_cast<char*>(bit);
+	wsabuf[0].len = 1;
 
-	m_ObjectMgr->BoardMove(m_HeroID, x, y, z, elapsedTime);
+	DWORD sent_size;
+	WSASend(socket, wsabuf, 1, &sent_size, 0, nullptr, nullptr);
+	wsabuf[0].len = BUFSIZE;
+	DWORD recv_size;
+	DWORD recv_flag = 0;
+	WSARecv(socket, wsabuf, 1, &recv_size, &recv_flag, nullptr, nullptr);
+
+
+	//m_ObjectMgr->BoardMove(m_HeroID, x, y, z, elapsedTime);
 
 
 	//float forceAmount = 2000.f;

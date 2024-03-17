@@ -9,7 +9,7 @@ but WITHOUT ANY WARRANTY.
 */
 
 #include "stdafx.h"
-#include <iostream>
+
 #include "Dependencies\glew.h"
 #include "Dependencies\freeglut.h"
 #include "timeapi.h"
@@ -22,6 +22,20 @@ GSPGame * g_game = NULL;
 GSPUserInterface* g_userInterface = NULL;
 DWORD g_startTime = 0;
 DWORD g_prevTime = 0;
+SOCKET server_s;
+
+void print_error(const char* msg, int err_no)
+{
+	WCHAR* msg_buf;
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, err_no,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		reinterpret_cast<LPWSTR>(&msg_buf), 0, NULL);
+	std::cout << msg;
+	std::wcout << L" : ¿¡·¯ : " << msg_buf;
+	while (true);
+	LocalFree(msg_buf);
+}
 
 void RenderScene(void)
 {
@@ -44,7 +58,7 @@ void RenderScene(void)
 	float elapsedTimeInSec = (float)elapsedTime / 1000.f;
 
 	//send key inputs
-	g_game->KeyInput(g_userInterface, elapsedTimeInSec);
+	g_game->KeyInput(g_userInterface, elapsedTimeInSec,server_s);
 
 	// Renderer Test
 	g_game->DrawAll(elapsedTimeInSec);
@@ -103,6 +117,21 @@ int main(int argc, char **argv)
 		std::cout << "GLEW 3.0 not supported\n ";
 	}
 
+	//server
+	std::wcout.imbue(std::locale("korean"));
+	WSADATA WSAData;
+	WSAStartup(MAKEWORD(2, 0), &WSAData);
+
+	server_s = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, 0, 0);
+	SOCKADDR_IN server_a;
+	server_a.sin_family = AF_INET;
+	server_a.sin_port = htons(PORT);
+	inet_pton(AF_INET, SERVER_ADDR, &server_a.sin_addr);
+	int res = connect(server_s, reinterpret_cast<sockaddr*>(&server_a), sizeof(server_a));
+	if (0 != res) {
+		print_error("connect", WSAGetLastError());
+	}
+
 	// Initialize Renderer
 	g_userInterface = new GSPUserInterface();
 	g_game = new GSPGame(500, 500);
@@ -118,6 +147,8 @@ int main(int argc, char **argv)
 	g_startTime = timeGetTime();
 	glutMainLoop();
 
+	closesocket(server_s);
+	WSACleanup();
 	delete g_game;
 
     return 0;

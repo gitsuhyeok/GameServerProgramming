@@ -1,11 +1,19 @@
 #pragma once
+#include <string>
+#include <cstdlib>
+#include <fstream>
 #include <iostream>
+#include <vector>
+#include <assert.h>
+#include <cstdlib>
+
 #include <WS2tcpip.h>
 #pragma comment (lib, "WS2_32.LIB")
 
-constexpr short PORT = 4000;
-constexpr char SERVER_ADDR[] = "127.0.0.1";
-constexpr int BUFSIZE = 256;
+using namespace std;
+
+const short SERVER_PORT = 4000;
+const int BUFSIZE = 256;
 
 #define MAX_NUM_OBJECT 1000
 #define GRAVITY 9.8f
