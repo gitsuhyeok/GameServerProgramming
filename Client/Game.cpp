@@ -18,6 +18,8 @@ but WITHOUT ANY WARRANTY.
 #include "GSPGame.h"
 #include "GSPUserInterface.h"
 
+#include <regex>
+
 GSPGame * g_game = NULL;
 GSPUserInterface* g_userInterface = NULL;
 DWORD g_startTime = 0;
@@ -35,6 +37,13 @@ void print_error(const char* msg, int err_no)
 	std::wcout << L" : 에러 : " << msg_buf;
 	while (true);
 	LocalFree(msg_buf);
+}
+
+bool isValidIpAddress(const std::string& address) {
+	// IP 주소를 확인하기 위한 정규 표현식
+	std::regex ipRegex("^\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b$");
+
+	return std::regex_match(address, ipRegex);
 }
 
 void RenderScene(void)
@@ -100,6 +109,15 @@ void SpecialKeyUpInput(int id, int x, int y)
 
 int main(int argc, char **argv)
 {
+	string SERVER_ADDR;
+	cout << "서버 주소 입력 : ";
+	cin >> SERVER_ADDR;
+	if (!isValidIpAddress(SERVER_ADDR))
+	{
+		cout<<"잘못된 서버 주소 형식. 127.0.0.1 접속 시도합니다."<<endl;
+		SERVER_ADDR = "127.0.0.1";
+	}
+
 	// Initialize GL things
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
@@ -126,7 +144,7 @@ int main(int argc, char **argv)
 	SOCKADDR_IN server_a;
 	server_a.sin_family = AF_INET;
 	server_a.sin_port = htons(PORT);
-	inet_pton(AF_INET, SERVER_ADDR, &server_a.sin_addr);
+	inet_pton(AF_INET, SERVER_ADDR.c_str(), &server_a.sin_addr);
 	int res = connect(server_s, reinterpret_cast<sockaddr*>(&server_a), sizeof(server_a));
 	if (0 != res) {
 		print_error("connect", WSAGetLastError());
