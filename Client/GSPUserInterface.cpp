@@ -45,8 +45,8 @@ void GSPUserInterface::KeyDown(char key, int id)
 		break;
 	}
 
-	std::cout << m_SP_Arrow_Left << m_SP_Arrow_Up << m_SP_Arrow_Right << m_SP_Arrow_Down << std::endl;
-	std::cout << m_Spacebar << std::endl;
+	//std::cout << m_SP_Arrow_Left << m_SP_Arrow_Up << m_SP_Arrow_Right << m_SP_Arrow_Down << std::endl;
+	//std::cout << m_Spacebar << std::endl;
 }
 
 void GSPUserInterface::KeyUp(char key, int id)

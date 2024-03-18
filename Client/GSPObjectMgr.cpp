@@ -93,6 +93,18 @@ void GSPObjectMgr::GetObjectVel(int id, float* vx, float* vy, float* vz)
 	}
 }
 
+void GSPObjectMgr::SetObjectPos(int id, float x, float y, float z)
+{
+	if (m_Objects[id] != NULL)
+	{
+		m_Objects[id]->SetPos(x, y, z);
+	}
+	else
+	{
+		//log...
+	}
+}
+
 void GSPObjectMgr::GetObjectPos(int id, float* x, float* y, float* z)
 {
 	if (m_Objects[id] != NULL)

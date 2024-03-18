@@ -7,6 +7,11 @@ constexpr short PORT = 4000;
 constexpr char SERVER_ADDR[] = "127.0.0.1";
 constexpr int BUFSIZE = 256;
 
+struct SendObjectData {
+	int ID;
+	float x, y, z;
+};
+
 #define MAX_NUM_OBJECT 1000
 #define GRAVITY 9.8f
 #define BLOCK_MOVE 62.5f

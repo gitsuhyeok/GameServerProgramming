@@ -11,6 +11,7 @@ public:
 	void BoardMove(int id, float x, float y, float z, float elapsedTime);
 
 	float GetGameTime();
+	void GetObjectPos(int id, float* x, float* y, float* z);
 
 private:
 	GSPObjectMgr* m_ObjectMgr;

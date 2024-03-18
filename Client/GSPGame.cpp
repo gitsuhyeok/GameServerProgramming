@@ -141,40 +141,50 @@ void GSPGame::KeyInput(GSPUserInterface* ui, float elapsedTime,SOCKET socket)
 {
 	//character movement(hero)
 	
-	unsigned char bit[] = { 0b00000000 };
+	unsigned char bit = { 0b00000000 };
 	//player1 0
 	if (m_ObjectMgr->IsMoveCoolTimeExpired(m_HeroID))
 	{
 		if (ui->Is_SP_Arrow_Up_Down())
 		{
-			bit[0] |= 0b100;
+			bit |= 0b100;
 		}
 		if (ui->Is_SP_Arrow_Down_Down())
 		{
-			bit[0] |= 0b10;
+			bit |= 0b10;
 		}
 		if (ui->Is_SP_Arrow_Left_Down())
 		{
-			bit[0] |= 0b1000;
+			bit |= 0b1000;
 		}
 		if (ui->Is_SP_Arrow_Right_Down())
 		{
-			bit[0] |= 0b1;
+			bit |= 0b1;
 		}
 
 		m_ObjectMgr->ResetMoveCoolTime(m_HeroID);
 	}
-	WSABUF wsabuf[1];
-	wsabuf[0].buf = reinterpret_cast<char*>(bit);
-	wsabuf[0].len = 1;
+	if (bit & 0b11111111)
+	{
+		WSABUF wsabuf;
+		wsabuf.buf = (char*)&bit;
+		wsabuf.len = sizeof(bit);
 
-	DWORD sent_size;
-	WSASend(socket, wsabuf, 1, &sent_size, 0, nullptr, nullptr);
-	wsabuf[0].len = BUFSIZE;
-	DWORD recv_size;
-	DWORD recv_flag = 0;
-	WSARecv(socket, wsabuf, 1, &recv_size, &recv_flag, nullptr, nullptr);
+		DWORD sent_size;
+		WSASend(socket, &wsabuf, 1, &sent_size, 0, nullptr, nullptr);
 
+		SendObjectData sod;
+		wsabuf.buf = (char*)&sod;
+		wsabuf.len = sizeof(sod);
+		DWORD recv_size;
+		DWORD recv_flag = 0;
+		WSARecv(socket, &wsabuf, 1, &recv_size, &recv_flag, nullptr, nullptr);
+
+		m_ObjectMgr->SetObjectPos(sod.ID, sod.x, sod.y, sod.z);
+		cout << "ID : " << sod.ID << "x : " << sod.x << "y : " << sod.y << "z : " << sod.z << endl;
+		cout << wsabuf.len << endl;
+
+	}
 
 	//m_ObjectMgr->BoardMove(m_HeroID, x, y, z, elapsedTime);
 

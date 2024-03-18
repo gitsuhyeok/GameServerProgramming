@@ -3,9 +3,14 @@
 #include "GSPGlobal.h"
 #include "GSPGame.h"
 #include "GSPObjectMgr.h"
-
+#include <bitset>
 GSPGame* g_game = NULL;
 SOCKET server_s;
+
+struct SendObjectData {
+	int ID;
+	float x, y, z;
+};
 
 void print_error(const char* msg, int err_no)
 {
@@ -44,23 +49,21 @@ int main()
 	//GameObject Generate
 	g_game = new GSPGame(500, 500);
 
-	WSABUF wsabuf[1];
-
 	while (true) {
-		char buf[BUFSIZE];
+		unsigned char bit;
 
-		WSABUF wasbuf[1];
-		wsabuf[0].buf = buf;
-		wsabuf[0].len = BUFSIZE;
+		WSABUF wsabuf;
+		wsabuf.buf = (char*)&bit;
+		wsabuf.len = sizeof(bit);
 		DWORD recv_size;
 		DWORD recv_flag = 0;
-		int res = WSARecv(client_s, wsabuf, 1, &recv_size, &recv_flag, nullptr, nullptr);
+		int res = WSARecv(client_s, &wsabuf, 1, &recv_size, &recv_flag, nullptr, nullptr);
 		if (0 != res) {
 			print_error("WSARecv", WSAGetLastError());
 		}
 
-		
-		unsigned char bit = reinterpret_cast<unsigned char>(wsabuf[0].buf);
+		cout << bitset<8>(bit) << endl;
+		cout << wsabuf.len << endl;
 		int ID = (bit >> 4 ) & 0b1;
 		float x, y, z;
 		x = y = z = 0.f;
@@ -82,8 +85,16 @@ int main()
 			x += BLOCK_MOVE;
 		}
 		g_game->BoardMove(ID, x, y, z, g_game->GetGameTime());
+		
+		SendObjectData sod;
+		sod.ID = ID;
+		wsabuf;
+		g_game->GetObjectPos(sod.ID, &sod.x, &sod.y, &sod.z);
+		wsabuf.buf = (char*)&sod;
+		wsabuf.len = sizeof(sod);
 
-		//res = WSASend(client_s, )
+		DWORD sent_size=0;
+		res = WSASend(client_s, &wsabuf, 1, &sent_size, 0, nullptr, nullptr);
 	}
 	closesocket(server_s);
 	closesocket(client_s);

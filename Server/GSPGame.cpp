@@ -77,3 +77,15 @@ float GSPGame::GetGameTime()
 	return m_gameTime;
 }
 
+void GSPGame::GetObjectPos(int id, float* x, float* y, float* z)
+{
+	if (m_ObjectMgr != NULL)
+	{
+		m_ObjectMgr->GetObjectPos(id, x, y, z);
+	}
+	else
+	{
+
+	}
+}
+
