@@ -99,12 +99,7 @@ void CALLBACK send_callback(DWORD err_res,
 void CALLBACK recv_callback(DWORD err_res, DWORD r_size, LPWSAOVERLAPPED p_wsaover, DWORD rec_flag)
 {
 	cout << "recv_callback 실행" << endl;
-	cout << r_size << ":" << err_res << endl;
-	if (p_wsaover == &recv_wsaover)
-	{
-		cout << "wsaover 동일" << endl;
-	}
-
+	
 	if (err_res != 0)
 	{
 		print_error("WSARECV RECV_CALLBACK", WSAGetLastError());
@@ -123,9 +118,30 @@ void CALLBACK recv_callback(DWORD err_res, DWORD r_size, LPWSAOVERLAPPED p_wsaov
 	cout << "sod.id : " << sod.id << endl;
 	cout << "sod.type : " << sod.type << endl;
 
+	switch (sod.type)
+	{
+	case 0: //이동
+		g_game->SetObjectPos(sod.id, sod.x, sod.y, sod.z);
+		break;
+	case 1: //추가
+		if (g_game->GetHeroID() == -1)
+			g_game->SetHeroID(sod.id);
+		g_game->AddObject(sod.id, sod.x, sod.y, sod.z,
+			30, 30, 1.f,
+			1,
+			0, 0, 0,
+			0, 0, 0,
+			0, 0, 0,
+			TYPE_HERO,
+			2000,
+			-1,
+			sod.r, sod.g, sod.b, sod.a);
 
-	g_game->SetObjectPos(sod.id, sod.x, sod.y, sod.z);
-
+		break;
+	case 2: //삭제
+		g_game->DeleteObject(sod.id);
+		break;
+	}
 
 	//cout << "ID : " << sod.ID << "x : " << sod.x << "y : " << sod.y << "z : " << sod.z << endl;
 	//cout << r_size << endl;
@@ -217,7 +233,7 @@ void RenderScene(void)
 	// Renderer Test
 	g_game->DrawAll(elapsedTimeInSec);
 
-	SleepEx(0.1, true);
+	SleepEx(0.001, true);
 
 	glutSwapBuffers();
 }

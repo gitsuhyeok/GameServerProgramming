@@ -8,17 +8,17 @@ GSPGame::GSPGame(int windowSizeX, int windowSizeY)
 
 	m_ObjectMgr = new GSPObjectMgr();
 
-	m_HeroID = m_ObjectMgr->AddObject(-BLOCK_MOVE / 2, -15 + BLOCK_MOVE / 2, 0,
-		30, 30, 1.f,
-		1,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		TYPE_HERO,
-		2000,
-		-1,
-		1, 0, 0, 1
-	);
+	//m_HeroID = m_ObjectMgr->AddObject(-BLOCK_MOVE / 2, -15 + BLOCK_MOVE / 2, 0,
+	//	30, 30, 1.f,
+	//	1,
+	//	0, 0, 0,
+	//	0, 0, 0,
+	//	0, 0, 0,
+	//	TYPE_HERO,
+	//	2000,
+	//	-1,
+	//	1, 0, 0, 1
+	//);
 
 	//8*8 Ã¼½ºÆÇ
 	for (int i = 0; i < 9; i++)
@@ -82,6 +82,18 @@ int GSPGame::AddObject(int id, float posX, float posY, float posZ, float sizeX, 
 	}
 }
 
+bool GSPGame::DeleteObject(int id)
+{
+	if (m_ObjectMgr != NULL)
+	{
+		return m_ObjectMgr->DeleteObject(id);
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void GSPGame::DrawAll(float elapsedTime)
 {
 	//draw objects (Null! draw)
@@ -105,27 +117,28 @@ void GSPGame::KeyInput(GSPUserInterface* ui, float elapsedTime)
 
 	bit = { 0b00000000 };
 
-	//player1 0
-	if (m_ObjectMgr->IsMoveCoolTimeExpired(m_HeroID))
-	{
-		if (ui->Is_SP_Arrow_Up_Down())
+	if (m_HeroID != -1) {
+		if (m_ObjectMgr->IsMoveCoolTimeExpired(m_HeroID))
 		{
-			bit |= 0b100;
-		}
-		if (ui->Is_SP_Arrow_Down_Down())
-		{
-			bit |= 0b10;
-		}
-		if (ui->Is_SP_Arrow_Left_Down())
-		{
-			bit |= 0b1000;
-		}
-		if (ui->Is_SP_Arrow_Right_Down())
-		{
-			bit |= 0b1;
-		}
+			if (ui->Is_SP_Arrow_Up_Down())
+			{
+				bit |= 0b100;
+			}
+			if (ui->Is_SP_Arrow_Down_Down())
+			{
+				bit |= 0b10;
+			}
+			if (ui->Is_SP_Arrow_Left_Down())
+			{
+				bit |= 0b1000;
+			}
+			if (ui->Is_SP_Arrow_Right_Down())
+			{
+				bit |= 0b1;
+			}
 
-		m_ObjectMgr->ResetMoveCoolTime(m_HeroID);
+			m_ObjectMgr->ResetMoveCoolTime(m_HeroID);
+		}
 	}
 }
 
@@ -157,4 +170,14 @@ void GSPGame::GetBit(unsigned char* ibit)
 {
 	*ibit = bit;
 
+}
+
+int GSPGame::GetHeroID()
+{
+	return m_HeroID;
+}
+
+void GSPGame::SetHeroID(int id)
+{
+	m_HeroID = id;
 }

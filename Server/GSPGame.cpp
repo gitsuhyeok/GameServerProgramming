@@ -6,17 +6,17 @@ GSPGame::GSPGame(int windowSizeX, int windowSizeY)
 {
 	m_ObjectMgr = new GSPObjectMgr();
 
-	m_HeroID = m_ObjectMgr->AddObject(-BLOCK_MOVE / 2, -15 + BLOCK_MOVE / 2, 0,
-		30, 30, 1.f,
-		1,
-		0, 0, 0,
-		0, 0, 0,
-		0, 0, 0,
-		TYPE_HERO,
-		2000,
-		-1,
-		1, 0, 0, 1
-	);
+	//m_HeroID = m_ObjectMgr->AddObject(-BLOCK_MOVE / 2, -15 + BLOCK_MOVE / 2, 0,
+	//	30, 30, 1.f,
+	//	1,
+	//	0, 0, 0,
+	//	0, 0, 0,
+	//	0, 0, 0,
+	//	TYPE_HERO,
+	//	2000,
+	//	-1,
+	//	1, 0, 0, 1
+	//);
 
 	//8*8 Ã¼½ºÆÇ
 	for (int i = 0; i < 9; i++)

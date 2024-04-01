@@ -42,8 +42,6 @@ public:
 public:
 	EXP_OVER(char s_id, char* mess, int m_size)
 	{
-		//cout << "testsod" << endl;
-		//cout << s_id << "bb" << m_size << endl;
 		int size = m_size + sizeof(char) + sizeof(int);
 
 
@@ -54,19 +52,6 @@ public:
 		memcpy(buf, &size, sizeof(int));
 		memcpy(buf + sizeof(int), &s_id, sizeof(char));
 		memcpy(buf + sizeof(int) + sizeof(char), mess, m_size);
-
-		//cout << "EXP_OVER" << endl;
-		//cout << buf << ":" << sizeof(buf) << endl;
-		//SendObjectData testsod;
-		//testsod.ID = 0;
-		//char testid;
-		//int testsize;
-		//memcpy(&testsize, buf, sizeof(int));
-		//memcpy(&testid, buf+1, sizeof(char));
-		//memcpy(&testsod, buf+2, sizeof(testsod));
-		//cout << "prev send testsod" << endl;
-		//cout << testid << "AA" << testsize << endl;
-		//cout << testsod.x << ":" << testsod.y << ":" << testsod.z << endl;
 	}
 };
 
@@ -132,26 +117,37 @@ public:
 
 		if (0 == transfer_size) {
 			cout << "[" << s_id_ << "]와의 연결이 끊겼습니다." << endl;
-			delete this;
+			for (auto& ss : players)
+			{
+				SendObjectData temp_sod;
+				temp_sod.id = object_id; temp_sod.type = 2;
+				g_game->GetObjectPos(temp_sod.id, &temp_sod.x, &temp_sod.y, &temp_sod.z);
+				g_game->GetObjectColor(temp_sod.id, &temp_sod.r, &temp_sod.g, &temp_sod.b, &temp_sod.a);
+				char temp_buf[BUFSIZE];
+
+				memcpy(temp_buf, &temp_sod, sizeof(temp_sod));
+				ss.second.do_send(6000, temp_buf, sizeof(temp_sod));
+			}
+			object_id = -1;
 			return;
 		}
 
-		std::cout << "Message from Client : ";
+	/*	std::cout << "Message from Client : ";
 		for (DWORD i = 0; i < transfer_size; ++i)
 			std::cout << buf[i];
-		std::cout << std::endl;
+		std::cout << std::endl;*/
 
 		//g_game->BoardMove(0, *buf, g_game->GetGameTime());
 
 		memcpy(&bit, buf, sizeof(unsigned char));
 
 		cout << bit << ":" << sizeof(bit) << endl;
-		g_game->BoardMove(0, bit, g_game->GetGameTime());
+		g_game->BoardMove(object_id, bit, g_game->GetGameTime());
 		//-----------------------
 
 		//클라로 objectpos 값 전송
 		SendObjectData sod;
-		sod.id = 0; sod.type = 0;
+		sod.id = object_id; sod.type = 0;
 		g_game->GetObjectPos(sod.id, &sod.x, &sod.y, &sod.z);
 		g_game->GetObjectColor(sod.id, &sod.r, &sod.g, &sod.b, &sod.a);
 		cout << sod.x << ":" << sod.y << ":" << sod.z << endl;
@@ -161,12 +157,6 @@ public:
 
 		for (auto& ss : players)
 		{
-			/*SendObjectData testsod;
-			testsod.ID = 0;
-			memcpy(&testsod, buf, sizeof(testsod));
-			cout << "prev send testsod" << endl;
-			cout << testsod.x << ":" << testsod.y << ":" << testsod.z << endl;*/
-
 			ss.second.do_send(s_id_, buf, sizeof(sod));
 		}
 
@@ -194,11 +184,6 @@ void CALLBACK recv_callback(DWORD err_res,
 	LPWSAOVERLAPPED p_wsaover,
 	DWORD rec_flag)
 {
-	if (err_res != 0)
-	{
-		print_error("WSARECV RECV_CALLBACK", WSAGetLastError());
-
-	}
 	cout << "recv_callback" << endl;
 	players[p_wsaover].do_recv_callback(transfer_size);
 }
@@ -233,6 +218,47 @@ int main()
 		LPWSAOVERLAPPED p_over = new WSAOVERLAPPED;
 
 		players.try_emplace(p_over, client_s, p_over);
+
+		players[p_over].object_id = g_game->AddObject(-BLOCK_MOVE / 2, -15 + BLOCK_MOVE / 2, 0,
+			30, 30, 1.f,
+			1,
+			0, 0, 0,
+			0, 0, 0,
+			0, 0, 0,
+			TYPE_HERO,
+			2000,
+			-1,
+			1, 0, 0, 1);
+		//클라로 objectpos 값 전송
+		SendObjectData sod;
+		sod.id = players[p_over].object_id; sod.type = 1;
+		g_game->GetObjectPos(sod.id, &sod.x, &sod.y, &sod.z);
+		g_game->GetObjectColor(sod.id, &sod.r, &sod.g, &sod.b, &sod.a);
+		cout << sod.x << ":" << sod.y << ":" << sod.z << endl;
+		
+		char m_buf[BUFSIZE];
+
+		memcpy(m_buf, &sod, sizeof(sod));
+		//-----------------------
+
+		for (auto& ss : players)
+		{
+			if (ss.second.object_id != players[p_over].object_id && ss.second.object_id != -1)
+			{
+				SendObjectData temp_sod;
+				temp_sod.id = ss.second.object_id; temp_sod.type = 1;
+				g_game->GetObjectPos(temp_sod.id, &temp_sod.x, &temp_sod.y, &temp_sod.z);
+				g_game->GetObjectColor(temp_sod.id, &temp_sod.r, &temp_sod.g, &temp_sod.b, &temp_sod.a);
+				char temp_buf[BUFSIZE];
+
+				memcpy(temp_buf, &temp_sod, sizeof(temp_sod));
+				players[p_over].do_send(5000, temp_buf, sizeof(temp_sod));
+			}
+				
+			Sleep(100);
+			ss.second.do_send(5000, m_buf, sizeof(sod));
+		}
+
 
 		players[p_over].do_recv();
 	}

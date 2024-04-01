@@ -20,6 +20,7 @@ public:
 		float HP,
 		int ancestor,
 		float r, float g, float b, float a);
+	bool DeleteObject(int id);
 
 	void DrawAll(float elapsedTime);
 	void KeyInput(GSPUserInterface* ui, float elapsedTime);
@@ -27,7 +28,8 @@ public:
 	void SetObjectColor(int id, float r, float g, float b, float a);
 
 	void GetBit(unsigned char* ibit);
-
+	int GetHeroID();
+	void SetHeroID(int id);
 private:
 	Renderer* m_Renderer;
 	GSPObjectMgr* m_ObjectMgr;
