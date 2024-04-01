@@ -8,8 +8,7 @@ GSPGame::GSPGame(int windowSizeX, int windowSizeY)
 
 	m_ObjectMgr = new GSPObjectMgr();
 
-	//create hero object
-	m_HeroID = m_ObjectMgr->AddObject(-BLOCK_MOVE/2, -15+ BLOCK_MOVE/2, 0,
+	m_HeroID = m_ObjectMgr->AddObject(-BLOCK_MOVE / 2, -15 + BLOCK_MOVE / 2, 0,
 		30, 30, 1.f,
 		1,
 		0, 0, 0,
@@ -21,63 +20,7 @@ GSPGame::GSPGame(int windowSizeX, int windowSizeY)
 		1, 0, 0, 1
 	);
 
-
-	//for (int i = 0; i < 10; i++)
-	//{
-	//	float x = (500.f * (float)rand() / (float)RAND_MAX) - 250.f;
-	//	float y = (500.f * (float)rand() / (float)RAND_MAX) - 250.f;
-	//	float z = 0;
-
-	//	float sX = 50.f * (float)rand() / (float)RAND_MAX;
-	//	float sY = 50.f * (float)rand() / (float)RAND_MAX;
-	//	float sZ = 1.f;
-
-	//	float mass = 10.f;
-
-	//	float velX = (10.f * (float)rand() / (float)RAND_MAX) - 5.f;
-	//	float velY = (10.f * (float)rand() / (float)RAND_MAX) - 5.f;
-	//	float velZ = 0.f;
-
-	//	float accX = 0.f;
-	//	float accY = 0.f;
-	//	float accZ = 0.f;
-
-	//	float forceX = 0.f;
-	//	float forceY = 0.f;
-	//	float forceZ = 0.f;
-
-	//	int id = m_ObjectMgr->AddObject(x, y, z,
-	//		sX, sY, sZ,
-	//		mass,
-	//		velX, velY, velZ,
-	//		accX, accY, accZ,
-	//		forceX, forceY, forceZ,
-	//		TYPE_DEFAULT,
-	//		100,
-	//		-1);
-	//}
-
-	//float x1 = 0;
-	//float y1 = -250;
-	//float x2 = 0;
-	//float y2 = 62.5;
-
-	//float sx1 = 500;
-	//float sy1 = 10;
-	//float sx2 = 10;
-	//float sy2 = 500;
-	//int id = m_ObjectMgr->AddObject(x1, y1, 0,
-	//	10, 500, 1.f,
-	//	1,
-	//	0, 0, 0,
-	//	0, 0, 0,
-	//	0, 0, 0,
-	//	TYPE_DEFAULT,
-	//	2000,
-	//	-1
-	//);
-
-	 //8*8 체스판
+	//8*8 체스판
 	for (int i = 0; i < 9; i++)
 	{
 		float x = -250 + 62.5 * (float)i;
@@ -120,6 +63,25 @@ GSPGame::~GSPGame()
 	m_ObjectMgr = NULL;
 }
 
+int GSPGame::AddObject(int id, float posX, float posY, float posZ, float sizeX, float sizeY, float sizeZ, float mass, float velX, float velY, float velZ, float accX, float accY, float accZ, float forceX, float forceY, float forceZ, int type, float HP, int ancestor, float r, float g, float b, float a)
+{
+	if (m_ObjectMgr != NULL)
+	{
+		return m_ObjectMgr->AddObject(id, posX, posY, posZ,
+			sizeX, sizeY, sizeZ,
+			mass,
+			velX, velY, velZ,
+			accX, accY, accZ,
+			forceX, forceY, forceZ,
+			type, HP, ancestor,
+			r, g, b, a);
+	}
+	else
+	{
+		return -1;
+	}
+}
+
 void GSPGame::DrawAll(float elapsedTime)
 {
 	//draw objects (Null! draw)
@@ -137,11 +99,12 @@ void GSPGame::DrawAll(float elapsedTime)
 	m_gameTime += elapsedTime;
 }
 
-void GSPGame::KeyInput(GSPUserInterface* ui, float elapsedTime,SOCKET socket)
+void GSPGame::KeyInput(GSPUserInterface* ui, float elapsedTime)
 {
 	//character movement(hero)
-	
-	unsigned char bit = { 0b00000000 };
+
+	bit = { 0b00000000 };
+
 	//player1 0
 	if (m_ObjectMgr->IsMoveCoolTimeExpired(m_HeroID))
 	{
@@ -164,107 +127,34 @@ void GSPGame::KeyInput(GSPUserInterface* ui, float elapsedTime,SOCKET socket)
 
 		m_ObjectMgr->ResetMoveCoolTime(m_HeroID);
 	}
-	if (bit & 0b11111111)
+}
+
+void GSPGame::SetObjectPos(int id, float x, float y, float z)
+{
+	if (m_ObjectMgr != NULL)
 	{
-		WSABUF wsabuf;
-		wsabuf.buf = (char*)&bit;
-		wsabuf.len = sizeof(bit);
-
-		DWORD sent_size;
-		WSASend(socket, &wsabuf, 1, &sent_size, 0, nullptr, nullptr);
-
-		SendObjectData sod;
-		wsabuf.buf = (char*)&sod;
-		wsabuf.len = sizeof(sod);
-		DWORD recv_size;
-		DWORD recv_flag = 0;
-		WSARecv(socket, &wsabuf, 1, &recv_size, &recv_flag, nullptr, nullptr);
-
-		m_ObjectMgr->SetObjectPos(sod.ID, sod.x, sod.y, sod.z);
-		cout << "ID : " << sod.ID << "x : " << sod.x << "y : " << sod.y << "z : " << sod.z << endl;
-		cout << wsabuf.len << endl;
-
+		m_ObjectMgr->SetObjectPos(id, x, y, z);
 	}
+	else
+	{
+		//log...
+	}
+}
 
-	//m_ObjectMgr->BoardMove(m_HeroID, x, y, z, elapsedTime);
+void GSPGame::SetObjectColor(int id, float r, float g, float b, float a)
+{
+	if (m_ObjectMgr != NULL)
+	{
+		m_ObjectMgr->SetObjectColor(id, r, g, b, a);
+	}
+	else
+	{
+		//log...
+	}
+}
 
+void GSPGame::GetBit(unsigned char* ibit)
+{
+	*ibit = bit;
 
-	//float forceAmount = 2000.f;
-	//if (ui->Is_SP_Arrow_Up_Down())
-	//{
-	//	y += forceAmount;
-	//}
-	//if (ui->Is_SP_Arrow_Down_Down())
-	//{
-	//	y -= forceAmount;
-	//}
-	//if (ui->Is_SP_Arrow_Left_Down())
-	//{
-	//	x -= forceAmount;
-	//}
-	//if (ui->Is_SP_Arrow_Right_Down())
-	//{
-	//	x += forceAmount;
-	//}
-
-	//m_ObjectMgr->AddObjectForce(m_HeroID, x, y, z, elapsedTime);
-
-	////총
-	//if (ui->Is_Spacebar_Down())
-	//{
-	//	//bullet
-	//	// 0. can hero shoot bullet(is cooltime expired?)
-	//	bool canShoot = m_ObjectMgr->IsCoolTimeExpired(m_HeroID);
-	//	if (canShoot)
-	//	{
-	//		//1 get hero position
-	//		float  vx, vy, vz;
-	//		float  x, y, z;
-	//		m_ObjectMgr->GetObjectPos(m_HeroID, &x, &y, &z);
-	//		m_ObjectMgr->GetObjectVel(m_HeroID, &vx, &vy, &vz);
-
-	//		//2 calc bullet velocity
-	//		float mag = sqrtf(vx * vx + vy * vy);
-	//		float bulletVX = 1.f;
-	//		float bulletVY = 0.f;
-	//		float bulletSpeed = 1000.f;
-	//		float theta = m_gameTime * 10.f;
-
-	//		float newBX = cos(theta) * bulletVX - sin(theta) * bulletVY;
-	//		float newBY = sin(theta) * bulletVX + cos(theta) * bulletVY;
-
-	//		newBX *= bulletSpeed;
-	//		newBY *= bulletSpeed;
-
-	//		m_ObjectMgr->AddObject(x, y, z,
-	//			5, 5, 5,
-	//			1,
-	//			newBX, newBY, 0,
-	//			0, 0, 0,
-	//			0, 0, 0,
-	//			TYPE_BULLET,
-	//			10,
-	//			m_HeroID,
-	//			0, 0, 0, 1);
-
-	//		//if (mag > FLT_EPSILON)
-	//		//{
-	//		//	vx = vx / mag;
-	//		//	vy = vy / mag;
-	//		//	bulletVX = bulletSpeed * vx;
-	//		//	bulletVY = bulletSpeed * vy;
-
-	//		//	//3 add object(vel, pos)
-	//		//	m_ObjectMgr->AddObject(x, y, z,
-	//		//		20, 20, 10,
-	//		//		1,
-	//		//		bulletVX, bulletVY, 0,
-	//		//		0, 0, 0,
-	//		//		0, 0, 0,
-	//		//		TYPE_BULLET);
-	//		//}
-
-	//		m_ObjectMgr->ResetCoolTime(m_HeroID);
-	//	}
-	//}
 }

@@ -20,7 +20,7 @@ GSPObject::GSPObject()
 	m_accX = 0.f;
 	m_accY = 0.f;
 	m_accZ = 0.f;
-	
+
 	m_forceX = 0.f;
 	m_forceY = 0.f;
 	m_forceZ = 0.f;
@@ -115,7 +115,7 @@ void GSPObject::SetColor(float r, float g, float b, float a)
 	m_r = r;
 	m_g = g;
 	m_b = b;
-	m_a =a;
+	m_a = a;
 }
 
 void GSPObject::GetBBMin(float* x, float* y, float* z)
@@ -195,7 +195,7 @@ float GSPObject::GetHP()
 }
 void GSPObject::Draw(Renderer* renderer)
 {
-	renderer->DrawSolidRect(m_posX, m_posY, m_posZ, 
+	renderer->DrawSolidRect(m_posX, m_posY, m_posZ,
 		m_sizeX, m_sizeY, m_sizeZ,
 		m_r, m_g, m_b, m_a);
 
@@ -233,7 +233,7 @@ void GSPObject::Update(float elapsedTime)
 	float frictionDirY = -m_velY;
 
 	float mag = sqrtf(frictionDirX * frictionDirX + frictionDirY * frictionDirY);
-	
+
 	if (mag > FLT_EPSILON)
 	{
 		frictionDirX = frictionDirX / mag;
@@ -254,7 +254,7 @@ void GSPObject::Update(float elapsedTime)
 		{
 			m_velX = 0.f;
 		}
-		else 
+		else
 		{
 			m_velX = resultVelX;
 		}
@@ -308,9 +308,9 @@ void GSPObject::AddForce(float x, float y, float z, float elapsedTime)
 	float accY = y / m_mass;
 	float accZ = z / m_mass;
 
-	m_velX = m_velX + accX*elapsedTime;
-	m_velY = m_velY + accY*elapsedTime;
-	m_velZ = m_velZ + accZ*elapsedTime;
+	m_velX = m_velX + accX * elapsedTime;
+	m_velY = m_velY + accY * elapsedTime;
+	m_velZ = m_velZ + accZ * elapsedTime;
 }
 
 void GSPObject::BoardMove(float x, float y, float z, float elapsedTime)
@@ -319,7 +319,7 @@ void GSPObject::BoardMove(float x, float y, float z, float elapsedTime)
 	float newY = m_posY + y;
 	float newZ = m_posZ + z;
 	if (-250 < newX && newX < 250 && -250 < newY && newY < 250)
-	{ 
+	{
 		m_posX = newX;
 		m_posY = newY;
 		m_posZ = newZ;

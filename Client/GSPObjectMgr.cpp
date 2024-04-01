@@ -24,7 +24,41 @@ GSPObjectMgr::~GSPObjectMgr()
 
 	}
 }
+int GSPObjectMgr::AddObject(int id, float posX, float posY, float posZ,
+	float sizeX, float sizeY, float sizeZ,
+	float mass,
+	float velX, float velY, float velZ,
+	float accX, float accY, float accZ,
+	float forceX, float forceY, float forceZ,
+	int type,
+	float HP,
+	int ancestor,
+	float r, float g, float b, float a)
+{
+	//Find empty slot
+	int index = id;
 
+	if (index >= 0)
+	{
+		m_Objects[index] = new GSPObject();
+		m_Objects[index]->SetPos(posX, posY, posZ);
+		m_Objects[index]->SetSize(sizeX, sizeY, sizeZ);
+		m_Objects[index]->SetMass(mass);
+		m_Objects[index]->SetVel(velX, velY, velZ);
+		m_Objects[index]->SetAcc(accX, accY, accZ);
+		m_Objects[index]->SetForce(forceX, forceY, forceZ);
+		m_Objects[index]->SetType(type);
+		m_Objects[index]->SetID(index);
+		m_Objects[index]->SetHP(HP);
+		m_Objects[index]->SetParent(ancestor);
+		m_Objects[index]->SetColor(r, g, b, a);
+		return index;
+	}
+
+	std::cout << "No more empty object slot!" << std::endl;
+	return index;
+
+}
 int GSPObjectMgr::AddObject(float posX, float posY, float posZ,
 	float sizeX, float sizeY, float sizeZ,
 	float mass,
@@ -110,6 +144,18 @@ void GSPObjectMgr::GetObjectPos(int id, float* x, float* y, float* z)
 	if (m_Objects[id] != NULL)
 	{
 		m_Objects[id]->GetPos(x, y, z);
+	}
+	else
+	{
+		//log...
+	}
+}
+
+void GSPObjectMgr::SetObjectColor(int id, float r, float g, float b, float a)
+{
+	if (m_Objects[id] != NULL)
+	{
+		m_Objects[id]->SetColor(r, g, b, a);
 	}
 	else
 	{

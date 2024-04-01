@@ -21,7 +21,7 @@ public:
 	void SetType(int type);
 	int GetType();
 	void SetColor(float r, float g, float b, float a);
-	
+
 	void GetBBMin(float* x, float* y, float* z);
 	void GetBBMax(float* x, float* y, float* z);
 

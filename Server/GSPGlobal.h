@@ -6,6 +6,9 @@
 #include <vector>
 #include <assert.h>
 #include <cstdlib>
+#include <bitset>
+#include <unordered_map>
+#include <random>
 
 #include <WS2tcpip.h>
 #pragma comment (lib, "WS2_32.LIB")
@@ -14,6 +17,12 @@ using namespace std;
 
 const short SERVER_PORT = 4000;
 const int BUFSIZE = 256;
+
+//random_device rd;
+//mt19937 gen(rd());
+//float min_val = 0.0f;
+//float max_val = 255.0f;
+//uniform_real_distribution<float> distribution(min_val, max_val);
 
 #define MAX_NUM_OBJECT 1000
 #define GRAVITY 9.8f

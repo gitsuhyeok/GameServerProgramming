@@ -105,6 +105,18 @@ void GSPObjectMgr::GetObjectPos(int id, float* x, float* y, float* z)
 	}
 }
 
+void GSPObjectMgr::GetObjectColor(int id, float* r, float* g, float* b, float* a)
+{
+	if (m_Objects[id] != NULL)
+	{
+		m_Objects[id]->GetColor(r, g, b, a);
+	}
+	else
+	{
+		//log...
+	}
+}
+
 void GSPObjectMgr::SetCoolTime(int id, float coolTime)
 {
 	if (m_Objects[id] != NULL)

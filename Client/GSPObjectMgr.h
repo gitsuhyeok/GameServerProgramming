@@ -9,21 +9,32 @@ public:
 	GSPObjectMgr();
 	~GSPObjectMgr();
 
+	int AddObject(int id, float posX, float posY, float posZ,
+		float sizeX, float sizeY, float sizeZ,
+		float mass,
+		float velX, float velY, float velZ,
+		float accX, float accY, float accZ,
+		float forceX, float forceY, float forceZ,
+		int type,
+		float HP,
+		int ancestor,
+		float r, float g, float b, float a);
 	int AddObject(float posX, float posY, float posZ,
-								float sizeX, float sizeY, float sizeZ,
-								float mass,
-								float velX, float velY, float velZ,
-								float accX, float accY, float accZ,
-								float forceX, float forceY, float forceZ,
-								int type,
-								float HP,
-								int ancestor,
-								float r, float g, float b, float a);
-	
+		float sizeX, float sizeY, float sizeZ,
+		float mass,
+		float velX, float velY, float velZ,
+		float accX, float accY, float accZ,
+		float forceX, float forceY, float forceZ,
+		int type,
+		float HP,
+		int ancestor,
+		float r, float g, float b, float a);
+
 	void SetObjectVel(int id, float vx, float vy, float vz);
 	void GetObjectVel(int id, float* vx, float* vy, float* vz);
 	void SetObjectPos(int id, float x, float y, float z);
 	void GetObjectPos(int id, float* x, float* y, float* z);
+	void SetObjectColor(int id, float r, float g, float b, float a);
 
 	void SetCoolTime(int id, float coolTime);
 	float GetCoolTime(int id);
@@ -37,7 +48,7 @@ public:
 
 	void AddObjectForce(int id, float x, float y, float z, float elapsedTime);
 	void BoardMove(int id, float x, float y, float z, float elapsedTime);
-	
+
 	float m_sizeX, m_sizeY, m_sizeZ = 0.f;
 	float m_posX, m_posY, m_posZ = 0.f;
 	float m_mass = 0.f;
